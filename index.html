@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6D 立体圣诞树</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      perspective: 1200px; /* 基础透视，营造空间感 */
+      transform-style: preserve-3d; /* 开启3D嵌套 */
+    }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1a2a6c, #b21f1f, #1a2a6c);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .tree-container {
+      position: relative;
+      animation: rotate 20s linear infinite; /* 整体3D旋转 */
+    }
+
+    /* 圣诞树主体 - 多层立体结构 */
+    .tree {
+      position: relative;
+      width: 200px;
+      height: 300px;
+    }
+    .tree-layer {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) rotateX(30deg); /* X轴倾斜增强立体 */
+      border-left: 100px solid transparent;
+      border-right: 100px solid transparent;
+      opacity: 0.9;
+      transition: all 0.3s ease;
+    }
+    .tree-layer:nth-child(1) {
+      border-bottom: 100px solid #2e7d32;
+      width: 200px;
+      z-index: 5;
+      transform: translateX(-50%) rotateX(30deg) translateZ(20px); /* Z轴分层 */
+    }
+    .tree-layer:nth-child(2) {
+      border-bottom: 120px solid #27662a;
+      width: 240px;
+      z-index: 4;
+      transform: translateX(-50%) rotateX(30deg) translateZ(0px);
+    }
+    .tree-layer:nth-child(3) {
+      border-bottom: 140px solid #1b4d1f;
+      width: 280px;
+      z-index: 3;
+      transform: translateX(-50%) rotateX(30deg) translateZ(-20px);
+    }
+    .tree-trunk {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%) rotateX(30deg) translateZ(-10px);
+      width: 40px;
+      height: 60px;
+      background: #8b4513;
+      z-index: 2;
+    }
+
+    /* 装饰：星星、彩灯、礼物 */
+    .star {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%) rotateX(30deg) translateZ(30px);
+      width: 40px;
+      height: 40px;
+      background: #ffeb3b;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      animation: twinkle 2s ease-in-out infinite alternate;
+      z-index: 6;
+    }
+    .light {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: flash 3s ease-in-out infinite;
+    }
+    .gift {
+      position: absolute;
+      bottom: -40px;
+      width: 50px;
+      height: 40px;
+      background: #e91e63;
+      transform: rotateX(30deg) translateZ(-30px); /* 底层礼物增强深度 */
+      z-index: 1;
+    }
+    .gift::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 100%;
+      background: #fff;
+    }
+    .gift::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: 100%;
+      height: 10px;
+      background: #fff;
+    }
+
+    /* 粒子特效容器 */
+    .snow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* 动画：旋转、闪烁、星光 */
+    @keyframes rotate {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    @keyframes twinkle {
+      0% { box-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b; }
+      100% { box-shadow: 0 0 20px #fff, 0 0 30px #ffeb3b; }
+    }
+    @keyframes flash {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; box-shadow: 0 0 15px currentColor; }
+    }
+  </style>
+</head>
+<body>
+  <div class="tree-container">
+    <!-- 圣诞树主体 -->
+    <div class="tree">
+      <div class="tree-layer"></div>
+      <div class="tree-layer"></div>
+      <div class="tree-layer"></div>
+      <div class="tree-trunk"></div>
+      <div class="star"></div>
+    </div>
+    <!-- 礼物 -->
+    <div class="gift" style="left: 30%;"></div>
+    <div class="gift" style="left: 60%; background: #2196f3;"></div>
+    <!-- 粒子容器 -->
+    <div class="snow"></div>
+  </div>
+
+  <script>
+    // 1. 生成彩灯
+    const tree = document.querySelector('.tree');
+    const colors = ['#ff0000', '#ff9800', '#4caf50', '#2196f3', '#9c27b0'];
+    for (let i = 0; i < 30; i++) {
+      const light = document.createElement('div');
+      light.className = 'light';
+      light.style.color = colors[Math.floor(Math.random() * colors.length)];
+      light.style.animationDelay = ${Math.random() * 3}s;
+      // 随机分布在三层树上
+      const layer = Math.floor(Math.random() * 3) + 1;
+      const layerEl = tree.querySelector(.tree-layer:nth-child(${layer}));
+      const x = Math.random() * 200 - 100; // 水平范围
+      const y = Math.random() * (layer * 30) - 50; // 垂直范围
+      light.style.transform = translateX(${x}px) translateY(${y}px) rotateX(30deg) translateZ(${20 - layer * 10}px);
+      layerEl.appendChild(light);
+    }
+
+    // 2. 生成雪花粒子（视差效果）
+    const snow = document.querySelector('.snow');
+    for (let i = 0; i < 150; i++) {
+      const flake = document.createElement('div');
+      flake.style.position = 'absolute';
+      flake.style.width = ${Math.random() * 3 + 1}px;
+      flake.style.height = ${Math.random() * 3 + 1}px;
+      flake.style.backgroundColor = '#fff';
+      flake.style.borderRadius = '50%';
+      flake.style.left = ${Math.random() * 100}vw;
+      flake.style.top = ${Math.random() * -100}vh;
+      // 视差：不同Z轴深度对应不同速度
+      const z = Math.random() * 200 - 100;
+      flake.style.transform = translateZ(${z}px);
+      const speed = 1 + Math.abs(z) / 50; // Z轴越远，下落越慢
+      const delay = Math.random() * 10;
+
+      // 下落动画
+      flake.style.animation = fall ${10 / speed}s linear infinite ${delay}s;
+      snow.appendChild(flake);
+    }
+
+    // 定义雪花下落动画
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fall {
+        0% { transform: translateZ(var(--z)) translateY(0) translateX(0); }
+        100% { transform: translateZ(var(--z)) translateY(100vh) translateX(var(--dx)); }
+      }
+    `;
+    document.head.appendChild(style);
+    // 给每个雪花设置自定义属性
+    document.querySelectorAll('.snow div').forEach(flake => {
+      const z = Math.random() * 200 - 100;
+      const dx = Math.random() * 50 - 25; // 水平漂移
+      flake.style.setProperty('--z', ${z}px);
+      flake.style.setProperty('--dx', ${dx}px);
+    });
+
+    // 3. 鼠标交互：视差偏移
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX - window.innerWidth / 2) / 50;
+      const y = (e.clientY - window.innerHeight / 2) / 50;
+      document.querySelector('.tree-container').style.transform = rotateX(${y}deg) rotateY(${x}deg);
+    });
+  </script>
+</body>
+</html>
